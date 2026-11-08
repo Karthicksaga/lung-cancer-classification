@@ -139,6 +139,16 @@ with st.sidebar:
     st.write("• **Input Features**: 15 clinical predictors")
     st.write("• **Target**: `LUNG_CANCER` (YES / NO)")
     st.write("• **Evaluation Split**: 242 hold-out records")
+    if os.path.exists("test_data.csv"):
+        with open("test_data.csv", "rb") as f:
+            st.download_button(
+                label="Download test_data.csv (242 records)",
+                data=f.read(),
+                file_name="test_data.csv",
+                mime="text/csv",
+                key="sidebar_download_test_data",
+                help="Download all 242 records of the test dataset"
+            )
     st.divider()
 
     st.markdown("**Available Models**")
@@ -161,6 +171,16 @@ st.caption("By default, evaluation metrics and predictions are displayed for the
 col_upload, col_select = st.columns([3, 2])
 with col_upload:
     uploaded_file = st.file_uploader("Upload Custom Test Dataset (CSV)", type=["csv"], help="Optional: Upload your own CSV containing the 15 features to evaluate.")
+    if os.path.exists("test_data.csv"):
+        with open("test_data.csv", "rb") as test_file:
+            st.download_button(
+                label="Download Benchmark Test Dataset (test_data.csv - 242 records)",
+                data=test_file.read(),
+                file_name="test_data.csv",
+                mime="text/csv",
+                key="uploader_download_test_data",
+                help="Download all 242 records of the benchmark test dataset to inspect or test uploading"
+            )
 
 with col_select:
     selected_model_name = st.selectbox("Select Classification Model", options=list(MODEL_FILES.keys()))
@@ -229,8 +249,15 @@ if uploaded_data is not None:
                 st.markdown("**Class Distribution**")
                 st.bar_chart(prediction_counts.set_index("Predicted Class"))
 
-            csv_output = prediction_results.to_csv(index=False).encode("utf-8")
-            st.download_button("Download Predictions", data=csv_output, file_name="lung_cancer_predictions.csv", mime="text/csv")
+            dl_col1, dl_col2 = st.columns(2)
+            with dl_col1:
+                csv_output = prediction_results.to_csv(index=False).encode("utf-8")
+                st.download_button("Download Predictions Only (CSV)", data=csv_output, file_name="lung_cancer_predictions.csv", mime="text/csv", key="download_preds_only")
+            with dl_col2:
+                full_predictions = uploaded_data.copy()
+                full_predictions["PREDICTED_LUNG_CANCER"] = predicted_labels
+                full_csv_output = full_predictions.to_csv(index=False).encode("utf-8")
+                st.download_button(f"Download All Records + Predictions ({len(full_predictions):,} rows)", data=full_csv_output, file_name="lung_cancer_full_predictions.csv", mime="text/csv", key="download_full_predictions")
 
         with evaluation_tab:
             if actual_values is None:
@@ -329,7 +356,19 @@ if uploaded_data is not None:
         with data_tab:
             st.subheader("Uploaded Test Dataset")
             st.write(f"Rows: {uploaded_data.shape[0]:,} | Columns: {uploaded_data.shape[1]}")
-            st.dataframe(uploaded_data.head(20), use_container_width=True)
+
+            download_filename = "test_data.csv" if not is_custom_upload else f"test_{uploaded_file.name}"
+            test_csv_bytes = uploaded_data.to_csv(index=False).encode("utf-8")
+            st.download_button(
+                label=f"Download All Test Records ({uploaded_data.shape[0]:,} rows, CSV)",
+                data=test_csv_bytes,
+                file_name=download_filename,
+                mime="text/csv",
+                key="download_all_test_records_csv",
+                help="Download all records of this test dataset in CSV format"
+            )
+
+            st.dataframe(uploaded_data, use_container_width=True)
 
     except Exception as error:
         st.error(f"Unable to process the uploaded CSV: {error}")
