@@ -8,7 +8,7 @@ In this project, I implemented five supervised machine learning algorithms, eval
 
 ## b. Dataset Description
 
-**Dataset Source:** Public Kaggle / UCI Machine Learning Repository (Lung Cancer Dataset)
+**Dataset Source:** Lung Cancer Dataset: https://www.kaggle.com/datasets/chandanmsr/more-accurate-lung-cancer-dataset
 
 The dataset contains 1,157 records and 15 input features. The target column is `LUNG_CANCER`, which contains two possible values: `YES` and `NO`.
 
@@ -47,11 +47,11 @@ I also applied feature scaling using `StandardScaler` for Logistic Regression, K
 
 ## c. GitHub Repository and Live Application
 
-**GitHub Repository:**  
-https://github.com/2026ak05434-a11y/lung-cancer-classification
+**GitHub Repository:**
+https://github.com/Karthicksaga/lung-cancer-classification
 
 **Live Streamlit Application:**  
-https://lung-cancer-classification.streamlit.app
+https://lung-cancer-classification-assignment.streamlit.app/
 
 The GitHub repository contains the notebook, trained models, preprocessing artifacts, test dataset, and Streamlit application source code.
 
